@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.set("view engine", "ejs");
 
 const { MongoClient } = require('mongodb');
 
@@ -38,6 +39,10 @@ app.get("/about", (req,res) =>{
 app.get("/list", async (req,res) => {
     let result = await db.collection('post').find().toArray();
 
-    console.log(result[0].title);
-    res.send(result[0].title);
+    res.render("list.ejs", {posts : result});
+})
+
+app.get("/time", (req,res) => {
+    let time = new Date();
+    res.render("time.ejs",{now : time});
 })
