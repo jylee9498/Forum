@@ -34,3 +34,10 @@ app.get("/shop", (req,res) =>{
 app.get("/about", (req,res) =>{
     res.sendFile(__dirname+"/mypage.html");
 });
+
+app.get("/list", async (req,res) => {
+    let result = await db.collection('post').find().toArray();
+
+    console.log(result[0].title);
+    res.send(result[0].title);
+})
