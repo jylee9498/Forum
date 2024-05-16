@@ -68,9 +68,22 @@ app.get("/write", (req,res) => {
     res.render("write.ejs");
 });
 
-app.post("/add", (req, res) => {
-    db.collection("post").insertOne({
-        title : req.body.title,
-        content : req.body.content,
-    });
+app.post("/add", async (req, res) => {
+    try{
+        if(req.body.title === ""){
+            res.send("title에 입력하지 않았습니다.");
+        }else{
+        //db에 데이터 저장
+       await db.collection("post").insertOne({
+            title : req.body.title,
+            content : req.body.content,
+        });
+        res.redirect("/");
+        }
+    }catch(e){
+        console.log(e);
+        res.status(500).send("서버 에러 발생.");
+    }
+
+
 });
