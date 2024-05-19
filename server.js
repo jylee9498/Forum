@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 // mongo DB를 사용하기 위해서 작성해야하는 부분. 우선 사용법을 익히자.
-const { MongoClient } = require('mongodb');
+const { MongoClient,ObjectId } = require('mongodb');
  let db;
  const url = "mongodb+srv://admin:1111@cluster0.u7x3pu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 new MongoClient(url).connect().then((client)=>{
@@ -54,7 +54,7 @@ app.get("/list", async (req,res) => {
     // collection("post") : post 테이블에 접근
     // find() : post 테이블의 데이터 조회
     // toArray() : 가져온 값을 배열형태로 보여준다.
-    let result = await db.collection('post').find().toArray();
+    let result = await db.collection("post").find().toArray();
     //서버가 브라우저에게 list.ejs를 렌더링하여 보내겠다는 의미임.
     res.render("list.ejs", {posts : result});
 });
@@ -84,6 +84,13 @@ app.post("/add", async (req, res) => {
         console.log(e);
         res.status(500).send("서버 에러 발생.");
     }
+});
 
-
+app.get("/detail/:aaaa", async (req,res) => {
+   await db.collection("post").findOne({_id: new ObjectId("66436d4e2af186ae2dd41029")});
+    /* post 테이블의 모든 데이터를 가져온다.
+      await db.collection("post").find().toArray();
+    */
+   console.log(req.params);
+    res.render("detail.ejs");
 });
