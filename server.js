@@ -78,7 +78,7 @@ app.post("/add", async (req, res) => {
             title : req.body.title,
             content : req.body.content,
         });
-        res.redirect("/");
+        res.redirect("/"); // 특정 url로 이동
         }
     }catch(e){
         console.log(e);
@@ -93,4 +93,16 @@ app.get("/detail/:aaaa", async (req,res) => {
     */
    console.log(req.params);
     res.render("detail.ejs");
+});
+
+app.get("/write2", (req,res) => {
+    res.render("write2.ejs")
+});
+
+app.post("/add2",async (req,res) => {
+    
+    db.collection("post").insertOne({
+        title : req.body.title,
+        content : req.body.content
+    });
 });
