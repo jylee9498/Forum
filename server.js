@@ -87,11 +87,11 @@ app.post("/add", async (req, res) => {
 });
 
 app.get("/detail/:aaaa", async (req,res) => {
-   await db.collection("post").findOne({_id: new ObjectId("66436d4e2af186ae2dd41029")});
+   let result = await db.collection("post").findOne({_id: new ObjectId("66436d4e2af186ae2dd41029")});
     /* post 테이블의 모든 데이터를 가져온다.
       await db.collection("post").find().toArray();
     */
-   console.log(req.params);
+   console.log(result);
     res.render("detail.ejs");
 });
 
