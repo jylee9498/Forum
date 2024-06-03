@@ -38,12 +38,6 @@ app.get("/news", (req,res) =>{
     db.collection("post").insertOne({title : "어쩌구"});
 });
 
-app.get("/shop", (req,res) =>{
-    // 문자열을 전달.
-    res.send("쇼핑페이지 입니다.");
-});
-
-
 app.get("/about", (req,res) =>{
     // __dirname은 현재 프로젝트 경로임. 거기의 mypage.html을 브라우저에 전달.
     res.sendFile(__dirname+"/mypage.html");
@@ -55,6 +49,7 @@ app.get("/list", async (req,res) => {
     // find() : post 테이블의 데이터 조회
     // toArray() : 가져온 값을 배열형태로 보여준다.
     let result = await db.collection("post").find().toArray();
+    
     //서버가 브라우저에게 list.ejs를 렌더링하여 보내겠다는 의미임.
     res.render("list.ejs", {posts : result});
 });
@@ -86,23 +81,15 @@ app.post("/add", async (req, res) => {
     }
 });
 
-app.get("/detail/:aaaa", async (req,res) => {
-   let result = await db.collection("post").findOne({_id: new ObjectId("66436d4e2af186ae2dd41029")});
+app.get("/detail/:id", async (req,res) => {
+   console.log(req.params)
+   console.log(typeof(req.params))
+   let result = await db.collection("post").findOne({
+    _id: new ObjectId(req.params.id)
+   });
     /* post 테이블의 모든 데이터를 가져온다.
-      await db.collection("post").find().toArray();
+      await db.cection("post").find().toArray();
     */
    console.log(result);
-    res.render("detail.ejs");
-});
-
-app.get("/write2", (req,res) => {
-    res.render("write2.ejs")
-});
-
-app.post("/add2",async (req,res) => {
-    
-    db.collection("post").insertOne({
-        title : req.body.title,
-        content : req.body.content
-    });
+   res.render("detail.ejs",{result:result});
 });
