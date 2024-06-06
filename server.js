@@ -5,8 +5,14 @@ const app = express();
 // ejs를 사용하기 위해 작성해야하는 부분. 우선 사용법을 익히자. 그리고 ejs 관련 라이브러리를 설치해야한다.(npm install ejs)
 app.set("view engine", "ejs");
 
+// method override 사용
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+
+
 
 // mongo DB를 사용하기 위해서 작성해야하는 부분. 우선 사용법을 익히자.
 const { MongoClient,ObjectId } = require('mongodb');
@@ -82,14 +88,46 @@ app.post("/add", async (req, res) => {
 });
 
 app.get("/detail/:id", async (req,res) => {
-   console.log(req.params)
-   console.log(typeof(req.params))
-   let result = await db.collection("post").findOne({
-    _id: new ObjectId(req.params.id)
-   });
-    /* post 테이블의 모든 데이터를 가져온다.
-      await db.cection("post").find().toArray();
-    */
-   console.log(result);
-   res.render("detail.ejs",{result:result});
+   try{
+    console.log(req.params)
+    console.log(typeof(req.params))
+    let result = await db.collection("post").findOne({
+     _id: new ObjectId(req.params.id)
+    });
+     /* post 테이블의 모든 데이터를 가져온다.
+       await db.cection("post").find().toArray();
+     */
+    console.log(result);
+    if (result === null){
+        res.status(400).send("잘못된 url 입력했습니다.");
+    }
+    res.render("detail.ejs",{result:result});
+   }catch(e){
+    console.log(e);
+    res.status(400).send("잘못된 url 입력했습니다.");
+   }
+});
+
+app.get("/edit/:id", async (req,res) => {
+    let result = await db.collection("post").findOne({
+        _id : new ObjectId(req.params.id)
+    });
+    console.log(result)
+    res.render("edit.ejs", {result:result});
+});
+
+app.put("/edit",  async (req,res) => {
+    try {
+        if (req.body.title === "" || req.body.content === "") {
+            res.send("title 혹은 content의 값이 비었습니다.");
+        }
+        let result = await db.collection("post").updateOne({ _id: new ObjectId(req.body.id) },
+            {
+                $set: { title: req.body.title, content: req.body.content }
+            });
+        console.log(result);
+        res.redirect("/list");
+    } catch (e) {
+        res.status(400).send("잘못된 title 혹은 content 값이 입력되었습니다.");
+    }
 });
