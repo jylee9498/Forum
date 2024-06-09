@@ -20,10 +20,31 @@
                     <%= posts[i].title%> 
                 </a>
                 <a href = "/edit/<%= posts[i]._id%>">✏️ </a>
+                <span class ="delete">🗑️</span>
             </h4>
             <p><%= posts[i].content%></p>
         </div>
         <%} %>
     </div>
+    <script>
+        document.querySelectorAll(".delete")[0].addEventListener("click", function(){
+            fetch("/abc", {         // fetch를 사용하면 ajax이용하는 것.(?) fetch("url")은 새로고침 없이도 GET요청함.
+                method : "POST",    // method에 Post를 사용하면 새로고침 없어도 Post 요청
+                headers : {
+                    "Content-Type" : "application/json"
+                },
+                body : JSON.stringify({a:1}) // object나 array를 문자열로 바꿔주는 함수
+            }); 
+        });
+
+        /* 서버로 전송할 때 다른 방법 */
+        /*
+            fetch("/abc/홍길동")
+            : url로 데이터 전송, 서버에서는 req.params로 데이터 획득 가능
+
+            fetch("/abc?age=20&name=홍길동")
+            : url로 데이터 전송, 서버에서는 req.query로 데이터 획득 가능
+         */
+    </script>
 </body>
 </html>

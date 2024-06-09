@@ -131,3 +131,9 @@ app.put("/edit",  async (req,res) => {
         res.status(400).send("잘못된 title 혹은 content 값이 입력되었습니다.");
     }
 });
+
+app.post("/abc", async (req, res) => {
+    console.log(req,body);      // ajax로 데이터를 전송할 때 header, body등으로 데이터를 담아 보낼 때
+    // console.log(req,params); // url에다가 데이터를 담아 보낼 때
+    // console.log(req.query);  // url에 데이터를 담아 보낼 때, 데이터가 여러개 일 때 
+})
