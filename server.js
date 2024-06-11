@@ -79,7 +79,7 @@ app.post("/add", async (req, res) => {
             title : req.body.title,
             content : req.body.content,
         });
-        res.redirect("/"); // 특정 url로 이동
+        res.redirect("/list"); // 특정 url로 이동
         }
     }catch(e){
         console.log(e);
@@ -132,8 +132,15 @@ app.put("/edit",  async (req,res) => {
     }
 });
 
-app.post("/abc", async (req, res) => {
-    console.log(req,body);      // ajax로 데이터를 전송할 때 header, body등으로 데이터를 담아 보낼 때
-    // console.log(req,params); // url에다가 데이터를 담아 보낼 때
-    // console.log(req.query);  // url에 데이터를 담아 보낼 때, 데이터가 여러개 일 때 
-})
+// app.post("/delete", async (req, res) => {
+//     console.log(req.body);      // ajax로 데이터를 전송할 때 header, body등으로 데이터를 담아 보낼 때
+//     // console.log(req,params); // url에다가 데이터를 담아 보낼 때
+//     // console.log(req.query);  // url에 데이터를 담아 보낼 때, 데이터가 여러개 일 때 
+
+//     let result = await db.collection("post").deleteOne(_id = new ObjectId(req.body.id));
+// })
+
+app.delete("/delete", async (req, res) => {
+    console.log(req.query)
+    await db.collection("post").deleteOne({_id:new ObjectId(req.query.docid)});
+});
