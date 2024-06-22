@@ -13,6 +13,18 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 
+// login 기능 및 session 기능에 필요한 라이브러리를 사용하기 위한 셋팅
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+app.use(passport.initialize());
+app.use(session({
+    secret : '암호화에 쓸 비번',
+    resave : false,
+    saveUninitialized : false,
+}));
+app.use(passport.session());
+
 
 // mongo DB를 사용하기 위해서 작성해야하는 부분. 우선 사용법을 익히자.
 const { MongoClient,ObjectId } = require('mongodb');
@@ -185,4 +197,55 @@ app.get("/list/next/:id", async (req,res) => {
         res.send("게시글이 없습니다.");
     }
     res.render("list.ejs",{posts : result});
+});
+
+// login.ejs에서 제출한 아이디와 비밀번호를 검사하는 코드임.
+// inputid : 입력한 아이디
+// inputpasswd : 입력한 비밀번호
+passport.use(new LocalStrategy(async (inputid, inputpasswd, cb) => {
+
+    let result = await db.collection('user').findOne({
+        username : inputid
+    });
+    if(!result){ // 아이디 일치 확인.
+        // cb(param1 , param2 , param3)
+        // 회원인증 실패시에는 param2에 false를 입력해야함.
+        // param3에 메세지 표출
+        return cb(null, false, {message: '아이디 DB에 없음'});
+    }
+    if(result.password ==  inputpasswd){ // 비밀번호 일치 확인
+        return cb(null,result)
+    }else{
+        return cb(null, false, {message : '비번불일치'});
+    }
+}));
+
+app.get("/login", async(req, res)=>{
+    res.render("login.ejs");
+});
+
+app.post("/login", async(req, res, next)=>{
+    console.log(req.body.username);
+    console.log(req.body.password);
+    // 아이디와 비번을 DB와 비교하는 코드임
+    // error : 비교 에러 시,
+    // user : 비교 성공 시, 유저 정보
+    // info : 비교 실패 시, 실패 이유
+    passport.authenticate('local',(error, user, info)=>{
+        console.log(error);
+        console.log(user);
+        console.log(info);
+        if(error){
+            return res.status(500).json(error);
+        }
+        if(!user){
+            return res.status(401).json(info.message);
+        }
+        req.logIn(user, (err)=>{
+            if(err){
+                return next(err);
+            }
+            res.redirect("/");
+        })
+    })(req, res, next)
 });
