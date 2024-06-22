@@ -49,16 +49,16 @@ app.get("/about", (req,res) =>{
     res.sendFile(__dirname+"/mypage.html");
 });
 
-app.get("/list", async (req,res) => {
+// app.get("/list", async (req,res) => {
 
-    // collection("post") : post 테이블에 접근
-    // find() : post 테이블의 데이터 조회
-    // toArray() : 가져온 값을 배열형태로 보여준다.
-    let result = await db.collection("post").find().toArray();
+//     // collection("post") : post 테이블에 접근
+//     // find() : post 테이블의 데이터 조회
+//     // toArray() : 가져온 값을 배열형태로 보여준다.
+//     let result = await db.collection("post").find().toArray();
     
-    //서버가 브라우저에게 list.ejs를 렌더링하여 보내겠다는 의미임.
-    res.render("list.ejs", {posts : result});
-});
+//     //서버가 브라우저에게 list.ejs를 렌더링하여 보내겠다는 의미임.
+//     res.render("list.ejs", {posts : result});
+// });
 
 app.get("/time", (req,res) => {
     let time = new Date();
@@ -143,4 +143,46 @@ app.put("/edit",  async (req,res) => {
 app.delete("/delete", async (req, res) => {
     console.log(req.query)
     await db.collection("post").deleteOne({_id:new ObjectId(req.query.docid)});
+    res.send("삭제완료");
+});
+
+// // 글목록 1~5번 목록
+// app.get("/list/1", async (req,res) => {
+//     // limit은 글목록을 5개 가져오기로 제한을 두는 것
+//     let result = await db.collection("post").find().limit(5).toArray();
+//     console.log(result);
+//     res.render("list.ejs",{posts : result});
+// });
+
+// // 글목록 6 ~ 10번 목록
+// app.get("/list/2", async (req,res) => {
+//     // skip은 글목록 5개를 스킵하고 이후 5개의 글목록을 가져오라는 것
+//     let result = await db.collection("post").find().skip(5).limit(5).toArray();
+//     console.log(result);
+//     res.render("list.ejs",{posts : result});
+// });
+
+// // 글목록 11 ~ 15번 목록
+// app.get("/list/3", async (req,res) => {
+//     let result = await db.collection("post").find().skip(10).limit(5).toArray();
+//     console.log(result);
+//     res.render("list.ejs",{posts : result});
+// });
+
+app.get("/list/:id", async (req,res) => { 
+    //console.log(req.params.id);
+    let result = await db.collection("post").find().skip((req.params.id -1)*5).limit(5).toArray();
+    // console.log(result);
+    res.render("list.ejs",{posts : result});
+});
+
+app.get("/list/next/:id", async (req,res) => {
+    let result = await db.collection("post")
+    .find({_id : {$gt : new ObjectId(req.params.id)}})
+    .skip((req.params.id -1)*5).limit(5).toArray();
+    
+    if(result[0] == undefined){
+        res.send("게시글이 없습니다.");
+    }
+    res.render("list.ejs",{posts : result});
 });
